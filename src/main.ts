@@ -39,7 +39,7 @@ async function run() {
     issue_title = getIssueOrPRTitle();
   }
 
-  if (!issue_title || !issue_body) {
+  if (!issue_title && !issue_body) {
     console.log("Could not get issue or PR title or body from context, exiting");
     return;
   }
@@ -51,7 +51,7 @@ async function run() {
   const removeLabelItems: string[] = [];
 
   if (enableVersionedRegex == 1) {
-    const regexVersion = versionedRegex.exec(issue_body);
+    const regexVersion = versionedRegex.exec(issue_body ?? '');
     if (!regexVersion || !regexVersion[1]) {
       if (bodyMissingRegexLabel) {
         await addLabels(client, issue_number, [bodyMissingRegexLabel]);
@@ -89,7 +89,7 @@ async function run() {
 
   let issueContent = "";
   if (includeTitle === 1) issueContent += `${issue_title}\n\n`;
-  issueContent += issue_body;
+  if (issue_body) issueContent += issue_body;
 
   for (const [label, globs] of labelRegexes.entries()) {
     if (checkRegexes(issueContent, globs)) {
